@@ -1,21 +1,30 @@
 // vividmedi-flow.js
 document.addEventListener("DOMContentLoaded", () => {
-  const continueBtn = document.querySelector(".continue-btn");
-  const step1 = document.querySelector(".step-1");
-  const step2 = document.querySelector(".step-2");
+  const steps = document.querySelectorAll(".form-section");
+  const buttons = document.querySelectorAll(".continue-btn");
   const progressBar = document.querySelector(".progress-bar");
 
-  if (!continueBtn || !step1 || !step2) return;
+  let currentStep = 0;
 
-  continueBtn.addEventListener("click", () => {
-    // Hide step 1
-    step1.style.display = "none";
-    // Show step 2
-    step2.style.display = "block";
-    // Update progress bar
-    if (progressBar) {
-      progressBar.style.width = "50%";
-    }
+  function showStep(index) {
+    steps.forEach((step, i) => {
+      step.classList.toggle("active", i === index);
+    });
+    progressBar.style.width = `${((index + 1) / steps.length) * 100}%`;
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  buttons.forEach((btn, index) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (index < steps.length - 1) {
+        currentStep++;
+        showStep(currentStep);
+      } else {
+        alert("Form completed — next page or submission coming soon!");
+      }
+    });
   });
+
+  showStep(currentStep);
 });
