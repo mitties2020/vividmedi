@@ -31,9 +31,11 @@
     .back-btn{background:#9daab3;}
     .certificate-preview{background:#fffaf3;border:1px solid #e1d3b8;border-radius:10px;padding:20px;margin-bottom:20px;}
     .payment-options{display:flex;flex-direction:column;gap:10px;margin:20px 0;}
-    .payment-option{border:2px solid #ccc;border-radius:10px;padding:15px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:border-color .3s ease;}
-    .payment-option.active{border-color:#4AA7FF;background:#f0faff;}
+    .payment-option{border:2px solid #ccc;border-radius:10px;padding:15px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:border-color .3s ease;text-decoration:none;color:#111;}
+    .payment-option:hover{border-color:#4AA7FF;background:#f0faff;}
     small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:.9rem;}
+    .success-screen{text-align:center;padding:30px;}
+    .success-icon{font-size:4rem;color:#00b67a;margin-bottom:15px;}
   </style>
 </head>
 <body>
@@ -45,7 +47,7 @@
   <div class="form-container">
 
     <!-- STEP 1 -->
-    <div class="form-section active" id="step1">
+    <div class="form-section active">
       <h2>Medical Certificate Request</h2>
       <p>Please note: The Medical Doctors are currently unable to review requests for fitness for work certificates as part of your consultation outcome.</p>
       <label>I am seeking *</label>
@@ -145,14 +147,24 @@
       <h2>Payment</h2>
       <p>Select your certificate duration to complete the request.</p>
       <div class="payment-options">
-        <div class="payment-option" data-days="1" data-price="15"><span>1 Day</span><strong>$15 AUD</strong></div>
-        <div class="payment-option" data-days="2" data-price="20"><span>2 Days</span><strong>$20 AUD</strong></div>
-        <div class="payment-option" data-days="3" data-price="25"><span>3 Days</span><strong>$25 AUD</strong></div>
-        <div class="payment-option" data-days="4" data-price="35"><span>4 Days</span><strong>$35 AUD</strong></div>
-        <div class="payment-option" data-days="5" data-price="50"><span>5 Days</span><strong>$50 AUD</strong></div>
+        <a href="https://square.link/u/IBwqrJ9s" target="_blank" class="payment-option"><span>1 Day</span><strong>$15 AUD</strong></a>
+        <a href="https://square.link/u/zAcyPAgn" target="_blank" class="payment-option"><span>2 Days</span><strong>$20 AUD</strong></a>
+        <a href="https://square.link/u/Yy0UMSHl" target="_blank" class="payment-option"><span>3 Days</span><strong>$25 AUD</strong></a>
+        <a href="https://square.link/u/cbKV3pjR" target="_blank" class="payment-option"><span>4 Days</span><strong>$35 AUD</strong></a>
+        <a href="https://square.link/u/aEwqH1pl" target="_blank" class="payment-option"><span>5 Days</span><strong>$50 AUD</strong></a>
       </div>
       <small class="note">Your information will now be reviewed by an AHPRA-registered medical doctor. Please keep your phone nearby in case we need to clarify any details.</small>
-      <div class="button-row"><button class="back-btn">Back</button><button class="continue-btn">Submit</button></div>
+      <div class="button-row"><button class="back-btn">Back</button><button class="continue-btn" id="submitBtn">Submit</button></div>
+    </div>
+
+    <!-- STEP 9 -->
+    <div class="form-section">
+      <div class="success-screen">
+        <div class="success-icon">✅</div>
+        <h2>Thank You!</h2>
+        <p>Your medical certificate request has been submitted.<br>You’ll receive your certificate shortly after payment confirmation.</p>
+        <button class="continue-btn" onclick="window.location.href='/'">Return Home</button>
+      </div>
     </div>
 
   </div>
