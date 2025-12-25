@@ -3,13 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const progressBar = document.querySelector(".progress-bar");
   let currentStep = 0;
 
-  const otherCertField = document.getElementById("otherPurposeField");
-  const otherCertInput = document.getElementById("otherPurpose");
+  const otherLeaveField = document.getElementById("otherLeaveField");
+  const otherLeaveInput = document.getElementById("otherLeave");
 
-  document.querySelectorAll("input[name='certType']").forEach(r => {
+  // Toggle Other text box for "This leave is from"
+  document.querySelectorAll("input[name='leaveFrom']").forEach(r => {
     r.addEventListener("change", () => {
-      if (r.value === "Other") otherCertField.style.display = "block";
-      else otherCertField.style.display = "none";
+      otherLeaveField.style.display = r.value === "Other" ? "block" : "none";
     });
   });
 
@@ -17,6 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
     steps.forEach((s,i)=>s.classList.toggle("active",i===index));
     progressBar.style.width=`${((index+1)/steps.length)*100}%`;
     window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function formatDate(date){
+    const d=new Date(date);
+    return d.toLocaleDateString("en-AU",{day:"2-digit",month:"2-digit",year:"numeric"});
   }
 
   function validateDates(){
@@ -37,20 +42,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const fname=document.getElementById("firstName").value;
     const lname=document.getElementById("lastName").value;
     const certType=document.querySelector("input[name='certType']:checked").value;
+    const leaveFrom=document.querySelector("input[name='leaveFrom']:checked").value;
     const reason=document.querySelector("input[name='reason']:checked").value;
-    const from=document.getElementById("fromDate").value;
-    const to=document.getElementById("toDate").value;
-    const otherText=otherCertInput.value.trim();
-    let context="work due to illness";
+    const from=formatDate(document.getElementById("fromDate").value);
+    const to=formatDate(document.getElementById("toDate").value);
+    const otherLeave=otherLeaveInput.value.trim();
+    let phrase="";
 
-    if(certType==="Sick Leave") context="work due to illness";
-    else if(certType==="Carer's Leave") context="caring responsibilities";
-    else if(certType==="Other" && otherText) context=otherText;
+    if(certType==="Sick Leave"){
+      if(leaveFrom==="Work") phrase="unfit for work due to illness";
+      else if(leaveFrom==="Studies") phrase="unfit for studies due to illness";
+      else phrase=`unfit for ${otherLeave||"duties"} due to illness`;
+    } else {
+      if(leaveFrom==="Work") phrase="required to care for another person and should be excused from work";
+      else if(leaveFrom==="Studies") phrase="required to care for another person and should be excused from studies";
+      else phrase=`required to care for another person and should be excused from ${otherLeave||"duties"}`;
+    }
 
     const preview=document.getElementById("certificatePreview");
     preview.innerHTML=`
       <strong>Medical Certificate</strong><br><br>
-      <p>I certify that in my medical opinion <strong>${fname} ${lname}</strong> is unfit for <strong>${context}</strong> and should be excused from duties from <strong>${from}</strong> to <strong>${to}</strong> inclusive.</p>
+      <p>I certify that in my medical opinion <strong>${fname} ${lname}</strong> is ${phrase} from <strong>${from}</strong> to <strong>${to}</strong> inclusive.</p>
       <p><em>Reason:</em> ${reason}</p>
       <p><small>Please check all information is correct before submission.</small></p>
     `;
