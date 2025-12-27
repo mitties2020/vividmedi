@@ -11,7 +11,20 @@
     .header{text-align:center;margin-bottom:25px;}
     .brand{font-size:2.2rem;font-weight:600;color:#111;}
     .brand span{color:#4AA7FF;}
-    .progress-wrapper{width:100%;max-width:600px;background:#e0e0e0;border-radius:10px;height:8px;margin:15px auto 30px;overflow:hidden;}
+    .tagline{
+      margin-top:8px;
+      font-size:.95rem;
+      color:#00b67a;
+      font-weight:500;
+      line-height:1.4;
+    }
+    .tagline span{
+      display:block;
+      color:#555;
+      font-weight:400;
+      font-size:.9rem;
+    }
+    .progress-wrapper{width:100%;max-width:600px;background:#e0e0e0;border-radius:10px;height:8px;margin:20px auto 30px;overflow:hidden;}
     .progress-bar{height:8px;width:12.5%;background:linear-gradient(to right,#4AA7FF,#7BE8D9);transition:width .4s ease;}
     .form-container{background:#fff;width:100%;max-width:600px;padding:35px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.1);}
     h2{text-align:center;font-size:1.4rem;margin-bottom:10px;}
@@ -44,11 +57,41 @@
     small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:.9rem;}
     .success-screen{text-align:center;padding:30px;}
     .success-icon{font-size:4rem;color:#00b67a;margin-bottom:15px;}
+
+    /* ✅ Trust badges */
+    .guarantees{
+      margin:25px 0 0;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:12px;
+      text-align:center;
+    }
+    .guarantee-item{
+      flex:1 1 30%;
+      min-width:150px;
+      background:#f5fff7;
+      border:1px solid #cdeed3;
+      border-radius:8px;
+      padding:10px 5px;
+      color:#00b67a;
+      font-size:.9rem;
+      font-weight:500;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+    }
+    .guarantee-item span{font-size:1.1rem;}
   </style>
 </head>
 <body>
   <div class="header">
     <h1 class="brand">Vivid<span>Medi</span></h1>
+    <p class="tagline">✅ Medical Certificates — from payment to your inbox in under 15 minutes<br>
+      <span>Reviewed & Issued by AHPRA-Registered Doctors<br>Accepted by Employers & Universities Australia-Wide</span>
+    </p>
     <div class="progress-wrapper"><div class="progress-bar"></div></div>
   </div>
 
@@ -57,7 +100,9 @@
     <!-- STEP 1 -->
     <div class="form-section active">
       <h2>Medical Certificate Request</h2>
-      <p>Please note: Our Medical Doctors are currently unable to review requests for fitness for work certificates as part of your consultation outcome.</p>
+      <p>Please note: Our Medical Doctors are currently unable to review requests for fitness for work certificates as part of your consultation outcome.
+        In line with best practice, we are also unable to issue Medical Certificates for periods longer than 5 days. 
+        .</p>
 
       <div class="radio-section">
         <label>I am seeking *</label>
@@ -79,6 +124,13 @@
       <div id="otherLeaveField" style="display:none;margin-top:10px;">
         <label>Please specify what this leave is for:</label>
         <input type="text" id="otherLeave" placeholder="e.g. training, volunteer work">
+      </div>
+
+      <!-- ✅ TRUST BADGES -->
+      <div class="guarantees">
+        <div class="guarantee-item"><span>✔</span>Issued by AHPRA-Registered Doctors</div>
+        <div class="guarantee-item"><span>✔</span>Accepted by Employers & Universities</div>
+        <div class="guarantee-item"><span>✔</span>Same-Day Delivery (Usually &lt;15 mins)</div>
       </div>
 
       <div class="button-row"><button class="continue-btn">Continue</button></div>
@@ -179,7 +231,7 @@
       <div class="success-screen">
         <div class="success-icon">✅</div>
         <h2>Thank You!</h2>
-        <p>Your medical certificate request has been submitted.<br>You’ll receive your certificate shortly after payment confirmation. Please keep your phone nearby in case one of our doctors need to clarify your details.</p>
+        <p>Your medical certificate request has been submitted.<br>You’ll receive your certificate shortly after payment confirmation.</p>
         <button class="continue-btn" onclick="window.location.href='/'">Return Home</button>
       </div>
     </div>
