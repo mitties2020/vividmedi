@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Medical Certificate | VividMedi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+    body{
+      background:#f9fbfc;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:40px 15px;
+    }
+    .container{
+      background:#fff;
+      width:100%;
+      max-width:600px;
+      padding:35px;
+      border-radius:16px;
+      box-shadow:0 6px 20px rgba(0,0,0,.1);
+      text-align:center;
+    }
+    h1{font-size:1.8rem;margin-bottom:10px;color:#111;}
+    h1 span{color:#4AA7FF;}
+    p.subtitle{color:#666;margin-bottom:30px;font-size:.95rem;}
+    input{
+      width:100%;
+      padding:12px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:1rem;
+      margin-bottom:20px;
+    }
+    button{
+      background:linear-gradient(to right,#4AA7FF,#7BE8D9);
+      color:#fff;
+      border:none;
+      padding:14px;
+      border-radius:6px;
+      font-weight:600;
+      cursor:pointer;
+      width:100%;
+      font-size:1rem;
+    }
+    .result{
+      margin-top:25px;
+      padding:20px;
+      border-radius:10px;
+      display:none;
+    }
+    .result.success{
+      background:#f3fff7;
+      border:1px solid #b8ecc4;
+      color:#006b2f;
+    }
+    .result.error{
+      background:#fff4f4;
+      border:1px solid #f3b3b3;
+      color:#c40c0c;
+    }
+    .cert-details{
+      text-align:left;
+      margin-top:15px;
+      font-size:.95rem;
+      color:#333;
+      line-height:1.6;
+    }
+    .cert-details strong{color:#111;}
+    footer{
+      margin-top:40px;
+      text-align:center;
+      color:#888;
+      font-size:.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Vivid<span>Medi</span></h1>
+    <p class="subtitle">Verify a Medical Certificate issued by an AHPRA-registered doctor.</p>
+
+    <input type="text" id="certInput" placeholder="Enter Certificate Number (e.g. MEDC123456)" />
+    <button onclick="verifyCert()">Verify Certificate</button>
+
+    <div class="result" id="resultBox">
+      <h3 id="resultTitle"></h3>
+      <div id="resultDetails" class="cert-details"></div>
+    </div>
+  </div>
+
+  <footer>© 2025 VividMedi Health — All Rights Reserved</footer>
+
+  <script>
+    async function verifyCert() {
+      const certCode = document.getElementById("certInput").value.trim();
+      const resultBox = document.getElementById("resultBox");
+      const resultTitle = document.getElementById("resultTitle");
+      const resultDetails = document.getElementById("resultDetails");
+
+      if (!certCode) {
+        alert("Please enter a certificate number.");
+        return;
+      }
+
+      resultBox.style.display = "none";
+
+      try {
+        const res = await fetch(`https://vividmedi-backend.onrender.com/api/verify/${certCode}`);
+        const data = await res.json();
+
+        if (data.valid) {
+          resultBox.className = "result success";
+          resultTitle.textContent = "✅ Verified Medical Certificate";
+          resultDetails.innerHTML = `
+            <p><strong>Certificate Number:</strong> ${data.certificate.certificateNumber}</p>
+            <p><strong>Issued On:</strong> ${new Date(data.certificate.issuedAt).toLocaleDateString()}</p>
+            <p><strong>Patient Name:</strong> ${data.certificate.patient}</p>
+            <p><strong>Reason:</strong> ${data.certificate.reason}</p>
+            <p><strong>Period:</strong> ${data.certificate.fromDate} to ${data.certificate.toDate}</p>
+            <hr>
+            <p><strong>Doctor:</strong> ${data.certificate.doctor}</p>
+            <p><strong>Clinic:</strong> ${data.certificate.clinic}</p>
+            <p><strong>Qualifications:</strong> ${data.certificate.qualifications}</p>
+            <p><strong>AHPRA Registration:</strong> ${data.certificate.ahpraNumber}</p>
+          `;
+        } else {
+          resultBox.className = "result error";
+          resultTitle.textContent = "❌ Invalid Certificate";
+          resultDetails.innerHTML = `<p>${data.message || "This certificate number is not registered in our system."}</p>`;
+        }
+
+        resultBox.style.display = "block";
+      } catch (err) {
+        resultBox.className = "result error";
+        resultTitle.textContent = "❌ Error Verifying Certificate";
+        resultDetails.innerHTML = `<p>${err.message}</p>`;
+        resultBox.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>
