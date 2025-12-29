@@ -1,65 +1,75 @@
-// vividmedi-flow.js — stable step flow + submit on Review (Step 7) + never-stuck submit
-console.log("✅ vividmedi-flow.js loaded");
+// vividmedi-flow.js — stable step flow + submit on Review (Step 7) Continue
+console.log("✅ vividmedi-flow.js loaded (stable)");
 
+// ------------------------------
+// DOM
+// ------------------------------
 const sections = document.querySelectorAll(".form-section");
 const progressBar = document.querySelector(".progress-bar");
-const continueButtons = document.querySelectorAll(".continue-btn:not(#submitBtn)");
+const continueButtons = document.querySelectorAll(".continue-btn"); // include all continues
 const backButtons = document.querySelectorAll(".back-btn");
-const paymentButtons = document.querySelectorAll(".payment-btn");
 
+// Support both styles:
+// - <button class="payment-btn" data-link="...">
+// - <a class="payment-option" href="...">
+const paymentTriggers = document.querySelectorAll(".payment-btn, .payment-option");
+
+const squareFrameContainer = document.getElementById("squareFrameContainer");
+const squareCheckoutFrame = document.getElementById("squareCheckoutFrame");
+
+// ✅ Your Render backend submit endpoint
 const SUBMIT_URL = "https://vividmedi-backend.onrender.com/api/submit";
 
+// State
 let submissionSent = false;
 let submissionResponse = null;
 
-/* ------------------------------
-   Overlay
---------------------------------*/
+// ------------------------------
+// Overlay
+// ------------------------------
 const overlay = document.createElement("div");
 overlay.style.cssText = `
   position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,0.85);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  color: #111;
-  z-index: 9999;
-  text-align: center;
-  padding: 20px;
+  top:0;left:0;width:100%;height:100%;
+  background:rgba(255,255,255,0.85);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:1.1rem;
+  color:#111;
+  z-index:9999;
+  text-align:center;
+  padding:20px;
 `;
-overlay.textContent = "Working…";
+overlay.textContent = "Working...";
 document.body.appendChild(overlay);
 
 function showOverlay(msg) {
-  overlay.textContent = msg || "Working…";
+  overlay.textContent = msg || "Working...";
   overlay.style.display = "flex";
 }
 function hideOverlay() {
   overlay.style.display = "none";
 }
 
-/* ------------------------------
-   Helpers
---------------------------------*/
-function getActiveIndex() {
-  return Array.from(sections).findIndex((s) => s.classList.contains("active"));
+// ------------------------------
+// Step helpers
+// ------------------------------
+function getActiveStepIndex() {
+  return Array.from(sections).findIndex((sec) => sec.classList.contains("active"));
 }
 
 function showSection(index) {
-  sections.forEach((s, i) => s.classList.toggle("active", i === index));
-  if (progressBar) {
-    progressBar.style.width = `${((index + 1) / sections.length) * 100}%`;
-  }
+  sections.forEach((sec, i) => sec.classList.toggle("active", i === index));
+  if (progressBar) progressBar.style.width = `${((index + 1) / sections.length) * 100}%`;
 }
 
-// init
+// Init to first section
 showSection(0);
 
-/* ------------------------------
-   Optional: show/hide “Other” field
---------------------------------*/
+// ------------------------------
+// Optional: show/hide Other leave field
+// ------------------------------
 function updateOtherLeaveField() {
   const otherRadio = document.getElementById("other");
   const field = document.getElementById("otherLeaveField");
@@ -71,39 +81,47 @@ document.querySelectorAll("input[name='leaveFrom']").forEach((r) => {
 });
 updateOtherLeaveField();
 
-/* ------------------------------
-   Payload
---------------------------------*/
+// ------------------------------
+// Build payload (THIS is what your backend receives)
+// ------------------------------
 function buildPayload() {
   return {
     certType: document.querySelector("input[name='certType']:checked")?.value || "",
     leaveFrom: document.querySelector("input[name='leaveFrom']:checked")?.value || "",
     otherLeave: document.getElementById("otherLeave")?.value || "",
     reason: document.querySelector("input[name='reason']:checked")?.value || "",
+
     email: document.getElementById("email")?.value || "",
     firstName: document.getElementById("firstName")?.value || "",
     lastName: document.getElementById("lastName")?.value || "",
     dob: document.getElementById("dob")?.value || "",
     mobile: document.getElementById("mobile")?.value || "",
     gender: document.querySelector("input[name='gender']:checked")?.value || "",
+
     address: document.getElementById("address")?.value || "",
     city: document.getElementById("city")?.value || "",
     state: document.getElementById("state")?.value || "",
     postcode: document.getElementById("postcode")?.value || "",
+
     fromDate: document.getElementById("fromDate")?.value || "",
     toDate: document.getElementById("toDate")?.value || "",
+
     symptoms: document.getElementById("symptoms")?.value || "",
     doctorNote: document.getElementById("doctorNote")?.value || "",
   };
 }
 
+// ------------------------------
+// Minimal required validation
+// ------------------------------
 function missingRequired(p) {
-  const req = [
+  const required = [
     "email",
     "firstName",
     "lastName",
     "dob",
     "mobile",
+    "gender",
     "address",
     "city",
     "state",
@@ -111,27 +129,27 @@ function missingRequired(p) {
     "fromDate",
     "toDate",
   ];
-  return req.filter((k) => !p[k]);
+  return required.filter((k) => !p[k]);
 }
 
-/* ------------------------------
-   Submit (with timeout + always hides overlay)
---------------------------------*/
-async function submitPatientInfo() {
-  if (submissionSent) return submissionResponse;
+// ------------------------------
+// Submit patient info (called on Review page Continue)
+// ------------------------------
+async function submitPatientInfoOnce() {
+  if (submissionSent && submissionResponse) return submissionResponse;
 
   const payload = buildPayload();
   const missing = missingRequired(payload);
   if (missing.length) {
-    alert("Please complete all required fields.");
-    throw new Error("Missing fields: " + missing.join(", "));
+    alert("Please complete all required fields before continuing.");
+    throw new Error("Missing required fields: " + missing.join(", "));
   }
 
   showOverlay("Submitting your details…");
 
-  // hard timeout so you never get stuck
+  // Hard timeout so you never get stuck
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
     const res = await fetch(SUBMIT_URL, {
@@ -146,7 +164,7 @@ async function submitPatientInfo() {
     if (!res.ok || !data?.success) {
       console.error("❌ Submit failed:", res.status, data);
       alert("❌ Submission failed. Please try again.");
-      throw new Error("Submission failed");
+      throw new Error("Submit failed");
     }
 
     submissionSent = true;
@@ -156,7 +174,6 @@ async function submitPatientInfo() {
     return data;
   } catch (err) {
     console.error("❌ Submit error:", err);
-
     if (err.name === "AbortError") {
       alert("⚠️ Submission timed out. Please click Continue again.");
     } else {
@@ -169,56 +186,71 @@ async function submitPatientInfo() {
   }
 }
 
-/* ------------------------------
-   Continue buttons
-   - Always advance
-   - On Review step (contains #certificatePreview), submit BEFORE advancing
---------------------------------*/
+// ------------------------------
+// Continue buttons
+// - Normal steps: go next
+// - Review step (Step 7): submit THEN go next (Payment)
+// ------------------------------
 continueButtons.forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const idx = getActiveIndex();
-    if (idx === -1) return;
+  btn.addEventListener("click", async (e) => {
+    const activeIndex = getActiveStepIndex();
+    if (activeIndex === -1) return;
 
-    const isReview = !!sections[idx].querySelector("#certificatePreview");
+    const activeSection = sections[activeIndex];
 
-    if (isReview && !submissionSent) {
-      try {
-        await submitPatientInfo();
-      } catch {
-        return; // don't advance if submit failed/timed out
+    // Identify Review step by presence of #certificatePreview in that section
+    const isReviewStep = !!activeSection.querySelector("#certificatePreview");
+
+    // If this is the Submit button on payment page (id="submitBtn"), don’t use Continue handler
+    if (btn.id === "submitBtn") return;
+
+    try {
+      if (isReviewStep) {
+        // Submit once on Review->Continue
+        await submitPatientInfoOnce();
       }
-    }
 
-    if (idx < sections.length - 1) {
-      showSection(idx + 1);
+      // Always move to next step
+      const nextIndex = Math.min(activeIndex + 1, sections.length - 1);
+      showSection(nextIndex);
+    } catch (err) {
+      // stay on current section
+      showSection(activeIndex);
     }
   });
 });
 
-/* ------------------------------
-   Back buttons
---------------------------------*/
+// ------------------------------
+// Back buttons
+// ------------------------------
 backButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
-    const idx = getActiveIndex();
-    if (idx > 0) showSection(idx - 1);
+    const activeIndex = getActiveStepIndex();
+    if (activeIndex === -1) return;
+    showSection(Math.max(0, activeIndex - 1));
   });
 });
 
-/* ------------------------------
-   Payment buttons (Square)
---------------------------------*/
-const squareFrameContainer = document.getElementById("squareFrameContainer");
-const squareCheckoutFrame = document.getElementById("squareCheckoutFrame");
-
-paymentButtons.forEach((btn) => {
-  btn.addEventListener("click", (e) => {
+// ------------------------------
+// Payment trigger behaviour
+// - If iframe exists, embed
+// - Otherwise open new tab
+// ------------------------------
+paymentTriggers.forEach((el) => {
+  el.addEventListener("click", (e) => {
+    // For <a>, stop navigation so we can control embedding
     e.preventDefault();
 
-    const link = btn.getAttribute("data-link");
+    let link = "";
+    if (el.classList.contains("payment-btn")) {
+      link = el.getAttribute("data-link") || "";
+    } else {
+      // payment-option <a>
+      link = el.getAttribute("href") || "";
+    }
+
     if (!link) return;
 
-    // embed if iframe exists
     if (squareFrameContainer && squareCheckoutFrame) {
       squareCheckoutFrame.src = link;
       squareFrameContainer.style.display = "block";
@@ -226,7 +258,20 @@ paymentButtons.forEach((btn) => {
       return;
     }
 
-    // otherwise open new tab
     window.open(link, "_blank", "noopener,noreferrer");
   });
 });
+
+// ------------------------------
+// If you still have a payment "Submit" button on Step 8,
+// you can optionally make it go to Thank You page:
+// ------------------------------
+const submitBtn = document.getElementById("submitBtn");
+if (submitBtn) {
+  submitBtn.addEventListener("click", () => {
+    const activeIndex = getActiveStepIndex();
+    if (activeIndex === -1) return;
+    const nextIndex = Math.min(activeIndex + 1, sections.length - 1);
+    showSection(nextIndex);
+  });
+}
