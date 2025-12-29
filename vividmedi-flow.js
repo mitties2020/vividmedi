@@ -1,18 +1,45 @@
-let currentStep = 0;
+console.log("✅ vividmedi-flow.js loaded (LIVE FRONTEND)");
+
 const sections = document.querySelectorAll(".form-section");
 const progressBar = document.querySelector(".progress-bar");
-let selectedPaymentLink = null;
+const continueButtons = document.querySelectorAll(".continue-btn:not(#submitBtn)");
+const backButtons = document.querySelectorAll(".back-btn");
+const paymentLinks = document.querySelectorAll(".payment-option");
+const submitBtn = document.getElementById("submitBtn");
 
-function showStep(step) {
-  sections.forEach((s, i) => s.classList.toggle("active", i === step));
-  progressBar.style.width = ((step + 1) / sections.length) * 100 + "%";
+const SUBMIT_URL = "https://vividmedi-backend.onrender.com/api/submit";
+
+let currentStep = 0;
+let submissionSent = false;
+let paymentStarted = false;
+
+// ------------------ UI helpers ------------------
+function showSection(index) {
+  sections.forEach((sec, i) => sec.classList.toggle("active", i === index));
+  if (progressBar) {
+    progressBar.style.width = `${((index + 1) / sections.length) * 100}%`;
+  }
 }
+showSection(currentStep);
 
-function collectData() {
-  const data = {
+// ------------------ Toggle Other field ------------------
+function toggleOther() {
+  const other = document.getElementById("other");
+  const field = document.getElementById("otherLeaveField");
+  if (!other || !field) return;
+  field.style.display = other.checked ? "block" : "none";
+}
+document.querySelectorAll("input[name='leaveFrom']").forEach(r =>
+  r.addEventListener("change", toggleOther)
+);
+toggleOther();
+
+// ------------------ Build payload ------------------
+function buildPayload() {
+  return {
     certType: document.querySelector("input[name='certType']:checked")?.value,
     leaveFrom: document.querySelector("input[name='leaveFrom']:checked")?.value,
-    otherLeave: document.getElementById("otherLeave")?.value || "",
+    otherLeave: document.getElementById("otherLeave")?.value,
     reason: document.querySelector("input[name='reason']:checked")?.value,
     email: document.getElementById("email")?.value,
     firstName: document.getElementById("firstName")?.value,
@@ -28,94 +55,80 @@ function collectData() {
     toDate: document.getElementById("toDate")?.value,
     symptoms: document.getElementById("symptoms")?.value,
     doctorNote: document.getElementById("doctorNote")?.value,
-    selectedPaymentLink
   };
-  return data;
 }
 
-// Handle "Other" field toggle
-document.querySelectorAll("input[name='leaveFrom']").forEach(radio => {
-  radio.addEventListener("change", () => {
-    document.getElementById("otherLeaveField").style.display =
-      radio.id === "other" ? "block" : "none";
-  });
-});
+// ------------------ Submit once (STEP 7) ------------------
+async function submitOnce() {
+  if (submissionSent) return;
 
-// Handle navigation buttons
-document.querySelectorAll(".continue-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
+  const payload = buildPayload();
+
+  if (!payload.email || !payload.firstName || !payload.lastName || !payload.fromDate || !payload.toDate) {
+    alert("❌ Please complete all required fields.");
+    throw new Error("Missing required fields");
+  }
+
+  const res = await fetch(SUBMIT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok || !data.success) {
+    alert("❌ Submission failed. Please try again.");
+    throw new Error("Submit failed");
+  }
+
+  submissionSent = true;
+  console.log("✅ Patient info emailed & stored:", data);
+}
+
+// ------------------ Continue buttons ------------------
+continueButtons.forEach(btn => {
+  btn.addEventListener("click", async () => {
+    // Step index:
+    // 0–5 normal, 6 = REVIEW, 7 = PAYMENT
+    if (currentStep === 6) {
+      try {
+        await submitOnce();
+      } catch {
+        return;
+      }
+    }
     if (currentStep < sections.length - 1) {
       currentStep++;
-      showStep(currentStep);
+      showSection(currentStep);
     }
   });
 });
 
-document.querySelectorAll(".back-btn").forEach(btn => {
+// ------------------ Back buttons ------------------
+backButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    if (currentStep > 0) {
-      currentStep--;
-      showStep(currentStep);
-    }
+    currentStep = Math.max(0, currentStep - 1);
+    showSection(currentStep);
   });
 });
 
-// Handle payment option click — just select, don’t navigate yet
-document.querySelectorAll(".payment-option").forEach(opt => {
-  opt.addEventListener("click", e => {
-    e.preventDefault();
-    document.querySelectorAll(".payment-option").forEach(o => o.style.borderColor = "#ccc");
-    opt.style.borderColor = "#4AA7FF";
-    selectedPaymentLink = opt.href;
-    console.log("💳 Selected payment link:", selectedPaymentLink);
+// ------------------ Payment tracking ------------------
+paymentLinks.forEach(link => {
+  link.addEventListener("click", () => {
+    paymentStarted = true;
   });
 });
 
-// Handle final submit
-const submitBtn = document.getElementById("submitBtn");
+// ------------------ Final Submit ------------------
 if (submitBtn) {
-  submitBtn.addEventListener("click", async () => {
-    const data = collectData();
-
-    if (!selectedPaymentLink) {
-      alert("⚠️ Please select a certificate duration before submitting.");
+  submitBtn.addEventListener("click", e => {
+    e.preventDefault();
+    if (!paymentStarted) {
+      alert("⚠️ Please select a payment option first.");
       return;
     }
-
-    try {
-      const res = await fetch("https://vividmedi-backend.onrender.com/api/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      const responseData = await res.json();
-      console.log("✅ Backend response:", responseData);
-
-      // Redirect to payment after data successfully logged
-      window.location.href = selectedPaymentLink;
-    } catch (err) {
-      console.error("❌ Error sending data:", err);
-      alert("There was an issue submitting your form. Please try again.");
-    }
+    currentStep++;
+    showSection(currentStep);
   });
 }
-
-// Initialize
-showStep(currentStep);
-// ✅ Embedded Square Payment Logic
-document.querySelectorAll(".payment-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const link = btn.dataset.link;
-    const frameContainer = document.getElementById("squareFrameContainer");
-    const frame = document.getElementById("squareCheckoutFrame");
-    const selection = document.getElementById("paymentSelection");
-
-    // Hide selection and show checkout iframe
-    selection.style.display = "none";
-    frameContainer.style.display = "block";
-    frame.src = link;
-
-    console.log("💳 Square checkout loaded:", link);
-  });
-});
