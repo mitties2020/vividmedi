@@ -103,3 +103,19 @@ if (submitBtn) {
 
 // Initialize
 showStep(currentStep);
+// ✅ Embedded Square Payment Logic
+document.querySelectorAll(".payment-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const link = btn.dataset.link;
+    const frameContainer = document.getElementById("squareFrameContainer");
+    const frame = document.getElementById("squareCheckoutFrame");
+    const selection = document.getElementById("paymentSelection");
+
+    // Hide selection and show checkout iframe
+    selection.style.display = "none";
+    frameContainer.style.display = "block";
+    frame.src = link;
+
+    console.log("💳 Square checkout loaded:", link);
+  });
+});
