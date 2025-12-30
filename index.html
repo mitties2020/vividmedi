@@ -95,30 +95,58 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
 } 
 .guarantee-item span{font-size:1.1rem;} 
 
-/* ✅ Small verify button (bottom-right corner) */ 
-.verify-corner { 
-  position: fixed; 
-  bottom: 15px; 
-  right: 20px; 
-  font-size: 0.80rem; 
-  color: #4AA7FF; 
-  background: #ffffff; 
-  padding: 8px 14px; 
-  border-radius: 15px; 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
-  text-decoration: none; 
-  font-weight: 500; 
-  transition: all 0.3s ease; 
-  z-index: 999; 
-} 
-.verify-corner:fixed { 
-  background: #4AA7FF; 
-  color: #fff; 
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15); 
-} 
-</style> 
-</head> 
+/* Bottom-right verify button */
+.verify-corner{
+  position: fixed;
+  bottom: 15px;
+  right: 16px;
+  font-size: 0.80rem;
+  color: #4AA7FF;
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  z-index: 999;
+}
 
+/* Use :hover for desktop, :active for mobile tap */
+.verify-corner:hover,
+.verify-corner:active{
+  background: #4AA7FF;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* Bottom-left support footer – never overlaps verify button */
+#support-footer{
+  position: fixed;
+  bottom: 15px;            /* SAME baseline as verify */
+  left: 16px;
+  width: auto;
+  max-width: calc(100vw - 180px); /* leaves room for verify button */
+  background: #f5f9ff;
+  border: 1px solid #cde5ff;
+  border-radius: 999px;    /* pill */
+  padding: 4px 8px;
+  font-size: 0.70rem;
+  line-height: 1.1;
+  color: #111;
+  z-index: 1000;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* trims nicely */
+}
+
+#support-footer a{
+  color: #4AA7FF;
+  font-weight: 500;
+  text-decoration: none;
+}
+<style> 
 <body> 
 <div class="header"> 
   <h1 class="brand">Vivid<span>Medi</span></h1> 
