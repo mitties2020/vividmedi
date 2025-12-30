@@ -174,7 +174,7 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
       <div class="guarantee-item"><span>✔</span>Same-Day Delivery &lt; 15 Minutes</div> 
     </div> 
 
-    <div class="button-row"><button class="continue-btn">Continue</button></div> 
+    <div class="button-row"><button type="button" class="continue-btn">Continue</button></div> 
   </div> 
 
   <!-- STEP 2 --> 
@@ -190,7 +190,7 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
       <input type="radio" name="reason" value="Anxiety, stress or depression"><label>Anxiety, stress or depression</label> 
       <input type="radio" name="reason" value="Other"><label>Other</label> 
     </div> 
-    <div class="button-row"><button class="back-btn">Back</button><button class="continue-btn">Continue</button></div> 
+    <div class="button-row"><button type="button" class="back-btn">Back</button><button type="button" class="continue-btn">Continue</button></div> 
   </div> 
 
   <!-- STEP 3 --> 
@@ -206,7 +206,7 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
       <input type="radio" name="gender" value="Male" checked><label>Male</label> 
       <input type="radio" name="gender" value="Female"><label>Female</label> 
     </div> 
-    <div class="button-row"><button class="back-btn">Back</button><button class="continue-btn">Continue</button></div> 
+    <div class="button-row"><button type="button" class="back-btn">Back</button><button type="button" class="continue-btn">Continue</button></div> 
   </div> 
 
   <!-- STEP 4 --> 
@@ -221,7 +221,7 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
       <option>SA</option><option>TAS</option><option>ACT</option><option>NT</option> 
     </select> 
     <label>Postcode *</label><input type="text" id="postcode" required> 
-    <div class="button-row"><button class="back-btn">Back</button><button class="continue-btn">Continue</button></div> 
+    <div class="button-row"><button type="button" class="back-btn">Back</button><button type="button" class="continue-btn">Continue</button></div> 
   </div> 
 
   <!-- STEP 5 --> 
@@ -231,7 +231,7 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
     <label>From *</label><input type="date" id="fromDate" required> 
     <label>To *</label><input type="date" id="toDate" required> 
     <p id="dateError" style="color:red;text-align:center;display:none;"></p> 
-    <div class="button-row"><button class="back-btn">Back</button><button class="continue-btn">Continue</button></div> 
+    <div class="button-row"><button type="button" class="back-btn">Back</button><button type="button" class="continue-btn">Continue</button></div> 
   </div> 
 
   <!-- STEP 6 --> 
@@ -240,7 +240,7 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
     <p>Please describe your symptoms and upload any relevant documents.</p> 
     <textarea id="symptoms" placeholder="e.g. fever, sore throat, fatigue..."></textarea> 
     <label>Upload Files (optional)</label><input type="file" accept=".pdf,.jpg,.jpeg,.png"> 
-    <div class="button-row"><button class="back-btn">Back</button><button class="continue-btn">Continue</button></div> 
+    <div class="button-row"><button type="button" class="back-btn">Back</button><button type="button" class="continue-btn">Continue</button></div> 
   </div> 
 
   <!-- STEP 8 --> 
@@ -251,11 +251,11 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
     <!-- Embedded Payment Section --> 
     <div id="paymentSelection"> 
       <div class="payment-options"> 
-        <button class="payment-btn" data-link="https://square.link/u/IBwqrJ9s">1 Day — $15 AUD</button> 
-        <button class="payment-btn" data-link="https://square.link/u/zAcyPAgn">2 Days — $20 AUD</button> 
-        <button class="payment-btn" data-link="https://square.link/u/Yy0UMSHl">3 Days — $25 AUD</button> 
-        <button class="payment-btn" data-link="https://square.link/u/cbKV3pjR">4 Days — $35 AUD</button> 
-        <button class="payment-btn" data-link="https://square.link/u/aEwqH1pl">5 Days — $50 AUD</button> 
+        <button type="button" class="payment-btn" data-link="https://square.link/u/IBwqrJ9s">1 Day — $15 AUD</button> 
+        <button type="button" class="payment-btn" data-link="https://square.link/u/zAcyPAgn">2 Days — $20 AUD</button> 
+        <button type="button" class="payment-btn" data-link="https://square.link/u/Yy0UMSHl">3 Days — $25 AUD</button> 
+        <button type="button" class="payment-btn" data-link="https://square.link/u/cbKV3pjR">4 Days — $35 AUD</button> 
+        <button type="button" class="payment-btn" data-link="https://square.link/u/aEwqH1pl">5 Days — $50 AUD</button> 
       </div> 
       <small class="note"> 
         Once you select your option, the secure checkout will appear below. 
@@ -274,7 +274,7 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
     </small> 
 
     <div class="button-row"> 
-      <button class="back-btn">Back</button> 
+      <button type="button" class="back-btn">Back</button> 
     </div> 
   </div> 
 
@@ -298,7 +298,7 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
       }); 
     </script> 
   </div> 
-</div> 
+
 </div> 
 
 <!-- ✅ Fixed Verify link in bottom-right corner --> 
@@ -315,17 +315,17 @@ small.note{display:block;text-align:center;margin-top:15px;color:#666;font-size:
 /* ✅ Fixed footer style */ 
 #support-footer {
   position: fixed;
-  bottom: 6px;              /* lift slightly off bottom */
+  bottom: 6px;
   left: 40%;
-  transform: translateX(-50%); /* centre it */
-  width: auto;              /* shrink to content */
+  transform: translateX(-50%);
+  width: auto;
   max-width: 80%;
   background: #f5f9ff;
   border: 1px solid #cde5ff;
   border-radius: 8px;
   text-align: center;
-  padding: 4px 8px;         /* MUCH smaller */
-  font-size: 0.75rem;       /* smaller text */
+  padding: 4px 8px;
+  font-size: 0.75rem;
   color: #111;
   z-index: 1000;
   box-shadow: 0 -1px 4px rgba(0,0,0,0.05);
