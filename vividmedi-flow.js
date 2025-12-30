@@ -191,32 +191,20 @@ async function submitPatientInfoOnce() {
 // - Normal steps: go next
 // - Review step (Step 7): submit THEN go next (Payment)
 // ------------------------------
+// ------------------------------
+// Continue buttons
+// - ONLY move to next step
+// ------------------------------
 continueButtons.forEach((btn) => {
-  btn.addEventListener("click", async (e) => {
+  btn.addEventListener("click", (e) => {
+    // Ignore payment submit button
+    if (btn.id === "submitBtn") return;
+
     const activeIndex = getActiveStepIndex();
     if (activeIndex === -1) return;
 
-    const activeSection = sections[activeIndex];
-
-    // Identify Review step by presence of #certificatePreview in that section
-    const isReviewStep = !!activeSection.querySelector("#certificatePreview");
-
-    // If this is the Submit button on payment page (id="submitBtn"), don’t use Continue handler
-    if (btn.id === "submitBtn") return;
-
-    try {
-      if (isReviewStep) {
-        // Submit once on Review->Continue
-        await submitPatientInfoOnce();
-      }
-
-      // Always move to next step
-      const nextIndex = Math.min(activeIndex + 1, sections.length - 1);
-      showSection(nextIndex);
-    } catch (err) {
-      // stay on current section
-      showSection(activeIndex);
-    }
+    const nextIndex = Math.min(activeIndex + 1, sections.length - 1);
+    showSection(nextIndex);
   });
 });
 
@@ -233,24 +221,29 @@ backButtons.forEach((btn) => {
 
 // ------------------------------
 // Payment trigger behaviour
-// - If iframe exists, embed
-// - Otherwise open new tab
+// ✅ SUBMIT DATA BEFORE PAYMENT (Option A)
 // ------------------------------
 paymentTriggers.forEach((el) => {
-  el.addEventListener("click", (e) => {
-    // For <a>, stop navigation so we can control embedding
+  el.addEventListener("click", async (e) => {
     e.preventDefault();
 
     let link = "";
     if (el.classList.contains("payment-btn")) {
       link = el.getAttribute("data-link") || "";
     } else {
-      // payment-option <a>
       link = el.getAttribute("href") || "";
     }
-
     if (!link) return;
 
+    try {
+      // ✅ THIS is what sends data to backend + Render logs
+      await submitPatientInfoOnce();
+    } catch (err) {
+      // If submission fails, do NOT proceed to payment
+      return;
+    }
+
+    // Proceed to payment
     if (squareFrameContainer && squareCheckoutFrame) {
       squareCheckoutFrame.src = link;
       squareFrameContainer.style.display = "block";
@@ -263,8 +256,7 @@ paymentTriggers.forEach((el) => {
 });
 
 // ------------------------------
-// If you still have a payment "Submit" button on Step 8,
-// you can optionally make it go to Thank You page:
+// Optional: Payment "Submit" button → Thank You
 // ------------------------------
 const submitBtn = document.getElementById("submitBtn");
 if (submitBtn) {
@@ -275,3 +267,4 @@ if (submitBtn) {
     showSection(nextIndex);
   });
 }
+
