@@ -236,10 +236,10 @@ paymentTriggers.forEach((el) => {
     if (!link) return;
 
     try {
-      // ✅ THIS is what sends data to backend + Render logs
+      // ✅ SEND DATA TO BACKEND (shows in Render logs)
       await submitPatientInfoOnce();
     } catch (err) {
-      // If submission fails, do NOT proceed to payment
+      // ❌ If submission fails, DO NOT open payment
       return;
     }
 
@@ -252,6 +252,9 @@ paymentTriggers.forEach((el) => {
     }
 
     window.open(link, "_blank", "noopener,noreferrer");
+  });
+});
+
   });
 });
 
