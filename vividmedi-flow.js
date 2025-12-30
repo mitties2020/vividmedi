@@ -196,8 +196,7 @@ async function submitPatientInfoOnce() {
 // - ONLY move to next step
 // ------------------------------
 continueButtons.forEach((btn) => {
-  btn.addEventListener("click", (e) => {
-    // Ignore payment submit button
+  btn.addEventListener("click", () => {
     if (btn.id === "submitBtn") return;
 
     const activeIndex = getActiveStepIndex();
@@ -221,11 +220,16 @@ backButtons.forEach((btn) => {
 
 // ------------------------------
 // Payment trigger behaviour
-// ✅ SUBMIT DATA BEFORE PAYMENT (Option A)
+// ✅ LOG TO RENDER WITHOUT DELAYING PAYMENT (Option A)
 // ------------------------------
+let paymentClickLock = false;
+
 paymentTriggers.forEach((el) => {
-  el.addEventListener("click", async (e) => {
+  el.addEventListener("click", (e) => {
     e.preventDefault();
+
+    if (paymentClickLock) return;      // prevents double opens
+    paymentClickLock = true;
 
     let link = "";
     if (el.classList.contains("payment-btn")) {
@@ -233,28 +237,32 @@ paymentTriggers.forEach((el) => {
     } else {
       link = el.getAttribute("href") || "";
     }
-    if (!link) return;
-
-    try {
-      // ✅ SEND DATA TO BACKEND (shows in Render logs)
-      await submitPatientInfoOnce();
-    } catch (err) {
-      // ❌ If submission fails, DO NOT open payment
+    if (!link) {
+      paymentClickLock = false;
       return;
     }
 
-    // Proceed to payment
+    // ✅ Fire-and-forget: send payload to backend for Render logs
+    // (does NOT block opening payment)
+    try {
+      submitPatientInfoOnce();
+    } catch (_) {
+      // ignore; submitPatientInfoOnce already handles its own errors
+    }
+
+    // ✅ Open payment immediately
     if (squareFrameContainer && squareCheckoutFrame) {
       squareCheckoutFrame.src = link;
       squareFrameContainer.style.display = "block";
       squareFrameContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
+    } else {
+      window.open(link, "_blank", "noopener,noreferrer");
     }
 
-    window.open(link, "_blank", "noopener,noreferrer");
-  });
-});
-
+    // unlock shortly after click
+    setTimeout(() => {
+      paymentClickLock = false;
+    }, 800);
   });
 });
 
@@ -270,4 +278,3 @@ if (submitBtn) {
     showSection(nextIndex);
   });
 }
-
